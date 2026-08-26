@@ -1,0 +1,253 @@
+SNAPDEAL ANALYTICS – DAX CALCULATIONS
+Power BI Project
+
+NOTE:
+Some fields such as Estimated Sales, Estimated Stock Value, and Estimated Return Rate
+were derived because the provided dataset did not contain the corresponding original
+business fields. These are proxy metrics and should be interpreted accordingly.
+
+TASK 1 – PRICING VS SATISFACTION EXCEPTION DETECTION =
+
+Estimated Sales =
+snapdeal_products[Price] * snapdeal_products[Reviews Count (listing)]
+
+Risk Score =
+snapdeal_products[Discount] *
+(1 - snapdeal_products[Rating (detail)] / 5) *
+snapdeal_products[Estimated Stock Value]
+
+Category Average Price =
+CALCULATE(
+    AVERAGE(snapdeal_products[Price]),
+    ALLEXCEPT(snapdeal_products, snapdeal_products[Top Section])
+)
+
+Category Average Rating =
+CALCULATE(
+    AVERAGE(snapdeal_products[Rating (detail)]),
+    ALLEXCEPT(snapdeal_products, snapdeal_products[Top Section])
+)
+
+Category Median Sales =
+CALCULATE(
+    MEDIAN(snapdeal_products[Estimated Sales]),
+    ALLEXCEPT(snapdeal_products, snapdeal_products[Top Section])
+)
+
+Risk Threshold =
+PERCENTILEX.INC(
+    ALL(snapdeal_products),
+    snapdeal_products[Risk Score],
+    0.8
+)
+
+TASK 2 – PROMOTION EFFECTIVENESS TREND ANALYSIS=
+
+Promotion Flag =
+IF(
+    snapdeal_products[Discount] >= 20,
+    "Promotion",
+    "Non-Promotion"
+)
+
+Average Discount =
+AVERAGE(snapdeal_products[Discount])
+
+Baseline Discount =
+CALCULATE(
+    AVERAGE(snapdeal_products[Discount]),
+    FILTER(
+        ALL(snapdeal_products),
+        snapdeal_products[Promotion Flag] = "Non-Promotion"
+    )
+)
+
+Promotion Discount =
+CALCULATE(
+    AVERAGE(snapdeal_products[Discount]),
+    FILTER(
+        ALL(snapdeal_products),
+        snapdeal_products[Promotion Flag] = "Promotion"
+    )
+)
+
+Promotional Lift =
+[Promotion Discount] - [Baseline Discount]
+
+NOTE:
+The provided dataset does not contain 30 days of historical observations.
+Therefore, the baseline was adapted using available non-promotional records.
+
+TASK 3 – DISCOUNT VS RATING CAUSATION ANALYSIS=
+
+Average Discount =
+AVERAGE(snapdeal_products[Discount])
+
+Average Rating =
+AVERAGE(snapdeal_products[Rating (detail)])
+
+Average Review Count =
+AVERAGE(snapdeal_products[Reviews Count (listing)])
+
+Discount Review Relationship =
+DIVIDE([Average Review Count], [Average Discount])
+
+Discount Band =
+SWITCH(
+    TRUE(),
+    snapdeal_products[Discount] < 20, "Low Discount",
+    snapdeal_products[Discount] < 50, "Medium Discount",
+    "High Discount"
+)
+
+Average Reviews by Discount Band =
+AVERAGE(snapdeal_products[Reviews Count (listing)])
+
+Review Volume Band =
+SWITCH(
+    TRUE(),
+    snapdeal_products[Reviews Count (listing)] <= 100, "Low Reviews",
+    snapdeal_products[Reviews Count (listing)] <= 500, "Medium Reviews",
+    "High Reviews"
+)
+
+Average Rating Controlled =
+AVERAGE(snapdeal_products[Rating (detail)])
+
+Regression Slope =
+VAR Data =
+    FILTER(
+        ALLSELECTED(snapdeal_products),
+        NOT ISBLANK(snapdeal_products[Discount]) &&
+        NOT ISBLANK(snapdeal_products[Rating (detail)])
+    )
+VAR AvgX = AVERAGEX(Data, snapdeal_products[Discount])
+VAR AvgY = AVERAGEX(Data, snapdeal_products[Rating (detail)])
+VAR Numerator =
+    SUMX(
+        Data,
+        (snapdeal_products[Discount] - AvgX) *
+        (snapdeal_products[Rating (detail)] - AvgY)
+    )
+VAR Denominator =
+    SUMX(
+        Data,
+        POWER(snapdeal_products[Discount] - AvgX, 2)
+    )
+RETURN DIVIDE(Numerator, Denominator)
+
+Regression Intercept =
+VAR Data =
+    FILTER(
+        ALLSELECTED(snapdeal_products),
+        NOT ISBLANK(snapdeal_products[Discount]) &&
+        NOT ISBLANK(snapdeal_products[Rating (detail)])
+    )
+VAR AvgX = AVERAGEX(Data, snapdeal_products[Discount])
+VAR AvgY = AVERAGEX(Data, snapdeal_products[Rating (detail)])
+RETURN AvgY - ([Regression Slope] * AvgX)
+
+Regression Predicted Rating =
+[Regression Intercept] +
+([Regression Slope] * AVERAGE(snapdeal_products[Discount]))
+
+TASK 4 – FINANCIALLY RISKY INVENTORY KPI=
+
+Financially At Risk % =
+VAR TotalRisk =
+    SUMX(
+        snapdeal_products,
+        COALESCE(snapdeal_products[Risk Score], 0)
+    )
+VAR TotalStock =
+    SUMX(
+        snapdeal_products,
+        COALESCE(snapdeal_products[Estimated Stock Value], 0)
+    )
+RETURN DIVIDE(TotalRisk, TotalStock, 0)
+
+Conditional formatting:
+Below 10% = Green
+10% to 25% = Yellow
+Above 25% = Red
+
+TASK 5 – TRUST-WEIGHTED RATING INDEX=
+
+Trust Score =
+snapdeal_products[Rating (detail)]
+    * LOG(1 + snapdeal_products[Reviews Count (listing)], 10)
+    * (1 - snapdeal_products[Estimated Return Rate])
+
+Trust Weighted Rating =
+DIVIDE(
+    SUMX(
+        snapdeal_products,
+        snapdeal_products[Trust Score] *
+        snapdeal_products[Rating (detail)]
+    ),
+    SUM(snapdeal_products[Trust Score]),
+    0
+)
+
+Simple Average Rating =
+AVERAGE(snapdeal_products[Rating (detail)])
+
+Review Weighted Rating =
+DIVIDE(
+    SUMX(
+        snapdeal_products,
+        snapdeal_products[Rating (detail)] *
+        snapdeal_products[Reviews Count (listing)]
+    ),
+    SUM(snapdeal_products[Reviews Count (listing)]),
+    0
+)
+
+Rating Comparison =
+DATATABLE(
+    "Rating Type", STRING,
+    {
+        {"Simple Average"},
+        {"Review Weighted"},
+        {"Trust Weighted"}
+    }
+)
+
+Rating Comparison Value =
+SWITCH(
+    SELECTEDVALUE('Rating Comparison'[Rating Type]),
+    "Simple Average", [Simple Average Rating],
+    "Review Weighted", [Review Weighted Rating],
+    "Trust Weighted", [Trust Weighted Rating]
+)
+
+TASK 6 – CONTEXT-AWARE PRICE BANDING=
+
+Price P30 =
+PERCENTILEX.INC(
+    ALLSELECTED(snapdeal_products),
+    snapdeal_products[Price],
+    0.30
+)
+
+Price P70 =
+PERCENTILEX.INC(
+    ALLSELECTED(snapdeal_products),
+    snapdeal_products[Price],
+    0.70
+)
+
+Dynamic Price Band =
+VAR CurrentPrice = SELECTEDVALUE(snapdeal_products[Price])
+VAR P30 = [Price P30]
+VAR P70 = [Price P70]
+RETURN
+    SWITCH(
+        TRUE(),
+        ISBLANK(CurrentPrice), BLANK(),
+        CurrentPrice <= P30, "Low",
+        CurrentPrice <= P70, "Medium",
+        "High"
+    )
+
+END OF DAX CALCULATIONS
