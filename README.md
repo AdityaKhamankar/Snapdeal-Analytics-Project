@@ -101,6 +101,3 @@ Through this project, I worked with:
 - Data analysis
 - Business-oriented interpretation of data
 
-## Project Status
-
-Completed as part of my Data Analytics internship.
