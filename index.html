@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snapdeal Analytics - Power BI</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f5f5;
+            color: #222;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #222;
+            color: white;
+            text-align: center;
+            padding: 45px 20px;
+        }
+
+        header h1 {
+            margin: 0 0 10px;
+            font-size: 32px;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        section {
+            max-width: 950px;
+            margin: 30px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .task {
+            border-bottom: 1px solid #ddd;
+            padding: 15px 0;
+        }
+
+        .task:last-child {
+            border-bottom: none;
+        }
+
+        .task h3 {
+            margin-bottom: 5px;
+        }
+
+        .links a {
+            display: inline-block;
+            margin-right: 15px;
+            margin-bottom: 10px;
+            text-decoration: none;
+            color: #0645ad;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Snapdeal Analytics – Power BI</h1>
+    <p>Data Analytics Internship Project</p>
+</header>
+
+<section>
+    <h2>About the Project</h2>
+
+    <p>
+        This project was completed as part of my Data Analytics internship.
+        The project uses Snapdeal product data to study pricing, discounts,
+        ratings, reviews, promotions and inventory-related risk.
+    </p>
+
+    <p>
+        The analysis was carried out using Power BI, Power Query and DAX.
+    </p>
+</section>
+
+<section>
+    <h2>Tasks Completed</h2>
+
+    <div class="task">
+        <h3>Task 1 – Pricing vs Satisfaction</h3>
+        <p>
+            Compared product prices, ratings and estimated sales and created
+            measures to identify products that may require attention.
+        </p>
+    </div>
+
+    <div class="task">
+        <h3>Task 2 – Promotion Effectiveness</h3>
+        <p>
+            Compared promotional and non-promotional discounts. The baseline
+            discount was 14.67% and the promotion discount was 69.65%.
+        </p>
+    </div>
+
+    <div class="task">
+        <h3>Task 3 – Discount vs Rating</h3>
+        <p>
+            Studied the relationship between discount, rating and review volume.
+            The regression slope was approximately 0.01.
+        </p>
+    </div>
+
+    <div class="task">
+        <h3>Task 4 – Financial Risk</h3>
+        <p>
+            Created a financial risk KPI. The calculated financially
+            at-risk inventory value was 25.40%.
+        </p>
+    </div>
+
+    <div class="task">
+        <h3>Task 5 – Trust-Weighted Rating</h3>
+        <p>
+            Compared simple average, review-weighted and trust-weighted ratings.
+            The trust-weighted rating was 4.11.
+        </p>
+    </div>
+
+    <div class="task">
+        <h3>Task 6 – Dynamic Price Banding</h3>
+        <p>
+            Created Low, Medium and High price bands using the 30th and
+            70th percentiles.
+        </p>
+    </div>
+</section>
+
+<section>
+    <h2>Tools Used</h2>
+    <p>Power BI &nbsp; | &nbsp; Power Query &nbsp; | &nbsp; DAX &nbsp; | &nbsp; CSV</p>
+</section>
+
+<section>
+    <h2>Limitations</h2>
+
+    <p>
+        The dataset was a product-level snapshot and did not contain enough
+        historical information for a proper 30-day trend analysis.
+    </p>
+
+    <p>
+        Actual sales, complete inventory history and actual return-rate data
+        were also not available. Therefore, some of the required metrics
+        were calculated using available fields as estimates or proxies.
+    </p>
+
+    <p>
+        Because of these limitations, the discount and rating analysis shows
+        relationships in the available data and does not prove causation.
+    </p>
+</section>
+
+<section class="links">
+    <h2>Project Links</h2>
+
+    <a href="https://github.com/" target="_blank">
+        GitHub Repository
+    </a>
+
+    <a href="#" target="_blank">
+        Dataset
+    </a>
+
+    <a href="#" target="_blank">
+        Project Report
+    </a>
+</section>
+
+<footer>
+    <p>Snapdeal Analytics Project | Data Analytics Internship</p>
+</footer>
+
+</body>
+</html>
